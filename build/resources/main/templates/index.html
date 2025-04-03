@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Bienvenido a la Tienda de Abarrotes</title>
+</head>
+<body>
+    <h1>Bienvenido a la Tienda de Abarrotes</h1>
+
+    <h2>Productos disponibles:</h2>
+    <ul>
+        <li th:each="producto : ${productos}">
+            <span th:text="${producto.nombre}"></span> - 
+            <span th:text="${producto.precio}"></span> - 
+            <span th:text="${producto.cantidad}"></span> disponibles
+        </li>
+    </ul>
+
+    <!-- Mostrar la alerta si hay un producto por agotarse -->
+    <div th:if="${alerta != null}" style="color: red; font-weight: bold;">
+        <p th:text="${alerta}"></p>
+    </div>
+
+    <img src="/images/logo.png" alt="Logo Tienda Abarrotes" />
+</body>
+</html>
