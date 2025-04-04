@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.6.3'  // Actualiza a la versión más reciente de Spring Boot
+    id 'org.springframework.boot' version '2.7.4'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
 }
@@ -13,13 +13,12 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'           // Para crear aplicaciones web
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'    // Para usar Thymeleaf en el frontend
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'     // Para integrar JPA (si usas bases de datos)
-    implementation 'org.springframework.boot:spring-boot-starter-security'    // Para seguridad (si es necesario)
-    implementation 'com.h2database:h2'                                        // Para base de datos en memoria (opcional)
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'     // Dependencia para pruebas
+    implementation 'org.springframework.boot:spring-boot-starter-web' // Para crear aplicaciones web
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf' // Para usar Thymeleaf en el frontend
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // Para integrar JPA (si usas bases de datos)
+    implementation 'org.springframework.boot:spring-boot-starter-security' // Para seguridad (si es necesario)
+    implementation 'com.h2database:h2' // Para base de datos en memoria (opcional)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test' // Dependencia para pruebas
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client' // Integración OAuth2
-    implementation 'com.auth0:auth0-spring-security-api:1.5.0'  // Integración de Auth0
+    implementation 'com.auth0:auth0-spring-security-api:1.5.0' // Integración de Auth0
 }
-

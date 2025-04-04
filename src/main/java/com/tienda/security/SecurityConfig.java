@@ -1,61 +1,54 @@
 package com.tienda.security;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecurityConfig {
 
-    @Value("${auth0.domain}")
-    private String auth0Domain;
-
-    @Value("${auth0.client-id}")
-    private String auth0ClientId;
-
-    @Value("${auth0.client-secret}")
-    private String auth0ClientSecret;
-
-    @Value("${auth0.callback-url}")
-    private String auth0CallbackUrl;
-
-    // Configura la seguridad para usar Auth0
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    // Configura la seguridad para usar un login básico
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/", "/login**", "/error**").permitAll() // Permitir el acceso a la página de login y error
-                .anyRequest().authenticated() // Requiere autenticación para cualquier otra solicitud
+                .antMatchers("/", "/login**", "/error**").permitAll()  // Permitir acceso al login y error
+                .anyRequest().authenticated()  // Requiere autenticación para cualquier otra solicitud
             .and()
-            .oauth2Login()  // Configuración de OAuth2 para utilizar Auth0
-                .loginPage("/login")  // Especifica la URL de inicio de sesión
+            .formLogin()
+                .loginPage("/login") // Especifica la URL de inicio de sesión
+                .defaultSuccessUrl("/productos", true)  // Redirige después del login a la página de productos
+                .permitAll() // Permite el acceso a la página de login
             .and()
             .logout()
-                .logoutUrl("/logout") // URL de cierre de sesión
-                .logoutSuccessUrl("/");  // Redirigir a la página de inicio después de salir
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/"); // Redirigir a la página de inicio después de salir
+
+        return http.build();
+    }
+
+    // Eliminar el uso de @Value y las variables no necesarias
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new InMemoryUserDetailsManager(
+            User.withUsername("admin") // Usuario predeterminado
+                .password(passwordEncoder().encode("admin123")) // Contraseña cifrada
+                .roles("USER")  // Rol del usuario
+                .build()
+        );
     }
 
     @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        ClientRegistration clientRegistration = ClientRegistration
-            .withRegistrationId("auth0")
-            .clientId(auth0ClientId)
-            .clientSecret(auth0ClientSecret)
-            .scope("openid", "profile", "email")
-            .authorizationUri("https://" + auth0Domain + "/authorize")
-            .tokenUri("https://" + auth0Domain + "/oauth/token")
-            .userInfoUri("https://" + auth0Domain + "/userinfo")
-            .redirectUri(auth0CallbackUrl)
-            // Elimina logoutUri, no es necesario para la configuración de Auth0 con Spring Security
-            .build();
-
-        return new InMemoryClientRegistrationRepository(clientRegistration);
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // Para cifrar la contraseña
     }
 }
